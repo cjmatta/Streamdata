@@ -7,9 +7,8 @@ module.exports = function (socket) {
     name: 'Bob'
   });
 
-  setInterval(function () {
-    socket.emit('send:time', {
-      time: (new Date()).toString()
-    });
-  }, 1000);
+  socket.on('introduction', function(id, msg){
+  	console.log(id + ":" + msg);
+  	socket.emit('hello', "Hello " + id + "!");
+  })
 };

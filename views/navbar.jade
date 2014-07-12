@@ -1,0 +1,14 @@
+div.navbar.navbar-default(role="navigation", ng-controller='NavbarCtrl')
+  div.container-fluid
+    div.navbar-header
+      button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target=".navbar-collapse")
+        span.sr-only
+          Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      a.navbar-brand(href="#") {{projectName}}
+    div.navbar-collapse.collapse(style="height: 1px;")
+      ul.nav.navbar-nav
+        li(ng-repeat="user in users", ng-class="{ active: isUserActive(user) }")
+          a(ng-href="/users/{{user}}"){{user}}
