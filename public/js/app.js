@@ -19,6 +19,10 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'partials/user',
       controller: 'UserCtrl'
     }).
+    when('/filestream', {
+      templateUrl: 'partials/filestream',
+      controller: 'FilestreamCtrl'
+    }).
     otherwise({
       redirectTo: '/'
     });

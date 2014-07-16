@@ -17,8 +17,6 @@ angular.module('myApp.controllers', []).
     $scope.user = $routeParams.user;
     $scope.data = [];
 
-    socket.emit('introduction', $scope.user);
-
     socket.on('hello', function (msg) {
       $scope.msg = msg;
     });
@@ -27,10 +25,6 @@ angular.module('myApp.controllers', []).
       socket.emit('getrooms');
     }
     
-    socket.on('testing', function (msg) {
-      console.log(msg);
-    });
-
     socket.on('rooms', function (data) {
       console.log("Rooms " + data);
     });
@@ -48,33 +42,49 @@ angular.module('myApp.controllers', []).
       $scope.data.push(record);
     });
 
-    socket.emit('join room', { room: 'room:' + $scope.user,
-                               user: $scope.user });
+    var _joinRoom = function (user) {
+      socket.emit('join room', { room: 'room:' + user,
+                                 user: user });
+    }
+
+    var _leaveRoom = function (user) {
+      socket.emit('leave room', { room: 'room:' + user,
+                                 user: user });
+    }
+
+    var _leaveAllRooms = function () {
+      socket.emit('leave all rooms');
+    }
+
+    _joinRoom($scope.user);
+
+    // re-join room on connection
+    socket.on('connected', function() {
+      _leaveAllRooms();
+      _joinRoom($scope.user);
+    });
+
     $scope.$on("$destroy", function () {
-      socket.emit('leave room', {room: 'room:' + $scope.user,
-                                 user: $scope.user });
+      _leaveRoom($scope.user);
     });
     
   }).
-  controller('NavbarCtrl', function ($scope, $location, socket){
-    $scope.active_user = null;
-    
-    $scope.isUserActive = function (user) {
-      return '/users/' + user === $location.path();
-    }
-
-    $scope.activateUser = function(user) {
-      $scope.active_user = user;
-    }
-
-    $scope.users = ['user1',
-                    'user2',
-                    'user3',
-                    'user4',
-                    'user5',
-                    'user6',
-                    'user7',
-                    'user8'];
-
+  controller('NavbarCtrl', function ($scope, $location, socket) {
     $scope.projectName = "Streamdata";
+  }).
+  controller('FilestreamCtrl', function ($scope, socket) {
+    $scope.users = [{name: 'user1', value: 'user1'},
+                   {name: 'user2', value: 'user2'},
+                   {name: 'user3', value: 'user3'},
+                   {name: 'user4', value: 'user4'},
+                   {name: 'user5', value: 'user5'},
+                   {name: 'user6', value: 'user6'},
+                   {name: 'user7', value: 'user7'},
+                   {name: 'user8', value: 'user8'}];
+
+    $scope.user = $scope.users[0];
+    $scope.submitForm = function() {
+      socket.emit('watchfile', $scope.user.name)
+      console.log($scope.file.name);
+    }
   });

@@ -4,8 +4,10 @@ var fs = require('fs'),
 	watch = require('watch'),
 	csv = require('csv'),
 	readSize = 0,
-	getAll = 1;
+	getAll = 1,
+	eventEmitter = require('events').EventEmitter;
 
+var emitter = new eventEmitter();
 var parser = csv.parse({
 	columns: ['pumpID',
 			  'datetime',
@@ -27,15 +29,15 @@ function _fileFilter (f, stat) {
 function _onChange (f, stats, prev) {
 	if (!_fileFilter(f, stats)) return;
 
-	if (prev) {
-		if (getAll === 1) {
+	if (getAll === 1) {
+		readSize = 0;
+	} else {
+		if (prev === null) {
+			console.log("New file");
 			readSize = 0;
 		} else {
-			readSize = prev.size;
+			readSize = prev.stats;
 		}
-	} else {
-		console.log("New file");
-		readSize = 0;
 	}
 
 	// if it's smaller, wait half a second
@@ -43,7 +45,7 @@ function _onChange (f, stats, prev) {
 		console.log("No change, come back later.");	
 		return;
 	}
-
+	console.log("Readsize: " + readSize);
 	// read the stream offset 
 	var stream = fs.createReadStream(f, {
 		start: readSize,
@@ -62,23 +64,35 @@ function _onChange (f, stats, prev) {
 	getAll = 0;
 }
 
+function _stopWatching() {
+	emitter.emit('stopwatching');
+}
+
 function _watchFile (watchDir, watchFile, callback) {
 	readSize = 0;
 	getAll = 1;
 
 	watch.createMonitor(watchDir, { filter: _fileFilter }, function (monitor) {
+		console.log("Watching " + watchDir + "/" + watchFile + ": getAll " + getAll);
 		monitor.on("changed", _onChange);
 		parser.on('readable', function() {
 			var record;
 			while(record = parser.read()) {
 				callback(record);
 			}
-		})
-	})
+		});
+
+		emitter.on('stopwatching', function () {
+			console.log("Stopping watching");
+			console.log(monitor);
+		});
+
+	});
 }
 
 var pumpdata = {
-	watchFile: _watchFile	
+	watchFile: _watchFile,
+	stopWatching: _stopWatching
 }
 
 module.exports = pumpdata
