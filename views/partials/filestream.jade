@@ -1,0 +1,6 @@
+form(name="filename")
+	div.fluid-row
+		select(ng-model="user", ng-options="u as u.name for u in users")
+	div.fluid-row.top-buffer
+		br
+		button.btn.btn-primary(ng-click="submitForm()") Watch File
