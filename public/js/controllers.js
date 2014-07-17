@@ -84,7 +84,10 @@ angular.module('myApp.controllers', []).
 
     $scope.user = $scope.users[0];
     $scope.submitForm = function() {
-      socket.emit('watchfile', $scope.user.name)
-      console.log($scope.file.name);
+      socket.emit('watchfile', $scope.user.name);
     }
+
+    socket.on('data', function(d) {
+      console.log(d);
+    });
   });
