@@ -1,6 +1,27 @@
-form(name="filename")
-	div.fluid-row
-		select(ng-model="user", ng-options="u as u.name for u in users")
-	div.fluid-row.top-buffer
-		br
-		button.btn.btn-primary(ng-click="submitForm()") Watch File
+p {{watching_status}}
+form.form.form-horizontal(name="filename")
+	div.form-group.col-md-3
+		select.form-control(ng-model="user", ng-options="u as u.name for u in users")
+		div.btn-group
+			button.btn.btn-default(ng-click="startWatching()", ng-disabled="isWatching()") Watch File
+			button.btn.btn-default(ng-click="stopWatching()", ng-disabled="!isWatching()") Stop Watching
+
+table.table
+	thead
+		tr
+			th Pump ID
+			th Hz
+			th Displacement
+			th Flow
+			th Sediment
+			th PSI
+			th Flow
+	tbody
+		tr(ng-repeat="pump in _.keys(data)")
+			td {{_.last(data[pump]).pumpID}}
+			td {{_.last(data[pump]).hz}}
+			td {{_.last(data[pump]).displacement}}
+			td {{_.last(data[pump]).flow}}
+			td {{_.last(data[pump]).sedimentppm}}
+			td {{_.last(data[pump]).psi}}
+			td {{_.last(data[pump]).flow}}

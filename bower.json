@@ -13,6 +13,7 @@
     "bootstrap": "~3.2.0",
     "lodash": "~2.4.1",
     "d3": "~3.4.10",
-    "angular-pusher": "~0.0.13"
+    "angular-pusher": "~0.0.13",
+    "moment": "~2.7.0"
   }
 }

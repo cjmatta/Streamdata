@@ -3,6 +3,10 @@ body {
   padding-top: 20px;
 }
 
+.btn {
+  padding: 5px, 9px;
+}
+
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;

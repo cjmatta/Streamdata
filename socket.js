@@ -17,12 +17,19 @@ module.exports.register =  function (io) {
 			clusterInfo.clusterName(function(clustername) {
 				var dirName = '/mapr/' + clustername + '/user/' + username + '/spark/output';
 				console.log("Watching: " + dirName + 'output.csv');
-				filewatcher.startWatching(dirName, 'output.csv');
+				pump.watchFile(dirName, 'output.csv', function(record) { 
+					console.log(record);
+					socket.emit('data', record);
+				});
 			});
 		});
 
 		socket.on('stopwatching', function () {
-			filewatcher.stopwatching();
+			pump.stopWatching();
 		});
+	});
+
+	io.sockets.on('disconnect', function () {
+		pump.stopWatching();
 	});
 }

@@ -72,7 +72,19 @@ angular.module('myApp.controllers', []).
   controller('NavbarCtrl', function ($scope, $location, socket) {
     $scope.projectName = "Streamdata";
   }).
-  controller('FilestreamCtrl', function ($scope, socket) {
+  controller('FilestreamCtrl', function ($scope, socket, _) {
+    $scope.watching_status = "Not watching file.";
+    $scope.data = [];
+    $scope._ = _;
+
+    function addData (data, record) {
+      if(!_.contains(_.keys(data), record.pumpID)) {
+        data[record.pumpID] = [];
+      }
+
+      data[record.pumpID].push(record);
+    }
+
     $scope.users = [{name: 'user1', value: 'user1'},
                    {name: 'user2', value: 'user2'},
                    {name: 'user3', value: 'user3'},
@@ -83,11 +95,22 @@ angular.module('myApp.controllers', []).
                    {name: 'user8', value: 'user8'}];
 
     $scope.user = $scope.users[0];
-    $scope.submitForm = function() {
+    $scope.startWatching = function() {
       socket.emit('watchfile', $scope.user.name);
+      $scope.watching_status = "Watching file."
     }
 
-    socket.on('data', function(d) {
-      console.log(d);
+    $scope.stopWatching = function () {
+      socket.emit('stopwatching');
+      $scope.watching_status = "Not watching file."
+    }
+
+    $scope.isWatching = function () {
+      return $scope.watching_status === "Watching file.";
+    }
+
+    socket.on('data', function(record) {
+      addData($scope.data, record);
+      console.log($scope.data);
     });
   });

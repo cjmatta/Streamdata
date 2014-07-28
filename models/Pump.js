@@ -70,7 +70,7 @@ function _stopWatching() {
 
 function _watchFile (watchDir, watchFile, callback) {
 	readSize = 0;
-	getAll = 1;
+	getAll = 0;
 
 	watch.createMonitor(watchDir, { filter: _fileFilter }, function (monitor) {
 		console.log("Watching " + watchDir + "/" + watchFile + ": getAll " + getAll);
@@ -84,7 +84,7 @@ function _watchFile (watchDir, watchFile, callback) {
 
 		emitter.on('stopwatching', function () {
 			console.log("Stopping watching");
-			console.log(monitor);
+			fs.unwatchFile(watchDir + '/' + watchFile);
 		});
 
 	});
